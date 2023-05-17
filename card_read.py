@@ -2,6 +2,14 @@ import cv2
 import pytesseract
 import numpy as np
 import matplotlib.pyplot as plt
+import mysql.connector
+mydb = mysql.connector.connect(
+    host="localhost",
+    user="root",
+    password="1234",
+    database="db"
+)
+
 
 pytesseract.pytesseract.tesseract_cmd = "C:/Users/Joel/AppData/Local/Programs/Tesseract-OCR/tesseract.exe"
 
@@ -32,29 +40,10 @@ def extract_text(image):
 # Preprocess the image
 preprocessed_image = preprocess_image(image)
 
-# Display the preprocessed image
-plt.imshow(preprocessed_image, cmap='gray')
-plt.axis('off')
-plt.show()
 
 # Specify the regions of interest coordinates
 numbers_roi = preprocessed_image[285:330, 88:712]
 text_roi = preprocessed_image[412:440, 77:397]
-
-# Display the extracted ROIs
-plt.subplot(1, 2, 1)
-plt.imshow(numbers_roi, cmap='gray')
-plt.title('Numbers ROI')
-plt.axis('off')
-
-plt.subplot(1, 2, 2)
-plt.imshow(text_roi, cmap='gray')
-plt.title('Text ROI')
-plt.axis('off')
-
-plt.tight_layout()
-plt.show()
-
 # Extract the numbers from numbers_roi
 numbers = extract_numbers(numbers_roi)
 
@@ -67,3 +56,16 @@ print(numbers)
 
 print("Extracted Text:")
 print(text)
+
+# Prepare the data for inserting into the database
+data = {
+    'name': text,
+    'id': numbers  # Convert id_number to an integer
+}
+
+# Insert the data into the database
+cursor = mydb.cursor()
+sql = "INSERT INTO data (name, id) VALUES (%(name)s, %(id)s)"
+cursor.execute(sql, data)
+mydb.commit()
+cursor.close()
