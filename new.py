@@ -1,7 +1,7 @@
 import cv2
 
 # Load the image
-image = cv2.imread("download.jpg")
+image = cv2.imread("id1.jpg")
 
 # Define the bounding box coordinates
 x1, y1, w1, h1 = 95, 260, 620, 80
